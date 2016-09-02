@@ -1,6 +1,5 @@
 BIN_JAVA <-
 function(data, parameter = NULL) {
-  .jinit(classpath="/home/jdyer1/eclipse/other/RecommenderLab/bin:/home/jdyer1/eclipse/other/RecommenderLab/lib/mtj-1.0.4.jar")
 	fileLoader <- .jnew("rl4j/FileLoader")
 
 	dataJ <- fileLoader$importData(as.vector(data@data@data), data@data@itemsetInfo$itemsetID, data@data@itemInfo$labels)
