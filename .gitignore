@@ -36,3 +36,4 @@ vignettes/*.pdf
 .classpath
 .project
 /.settings/
+/inst/java/
