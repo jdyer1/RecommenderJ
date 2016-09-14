@@ -1,10 +1,10 @@
-# RecommenderJ
+# recommenderlab.java
 A demonstration integrating the R "recommenderlab" package with Java
 
 ## Installation
-* `git clone` the RecommenderJ repository
+* `git clone` the recommenderlab.java repository
 * Build: `mvn clean install package`
-* R installation: `install.packages("/path/to/RecommenderJ", repos=NULL)`
+* R installation: `install.packages("/path/to/recommenderlab.java", repos=NULL)`
 
 ## Use
 * See the [recommenderlab paper](https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf) for details on how to evaluate recommender engines in R.
@@ -15,7 +15,7 @@ A demonstration integrating the R "recommenderlab" package with Java
 ## Example
 ```R
 # load required libraries
-> library(recommenderJ)
+> library(recommenderlab.java)
 Loading required package: rJava
 Loading required package: recommenderlab
 Loading required package: Matrix
@@ -31,12 +31,13 @@ Loading required package: arules
 + "random items" = list(name = "RANDOM", param=NULL),
 + "popular items" = list(name="POPULAR", param=NULL),
 + "built-in UBCF" = list(name="UBCF", param=list(nn=50)),
-+ "Java UBCF" = list(name="JAVA", param=NULL))
++ "Java UBCF" = list(name="JAVA", param=NULL),
++ "Lucene UBCF" = list(name="LUCENE"))
 > eval_sets <- evaluationScheme(data=Jester_binary, method="cross-validation", k=4, given=5)
 n_recommendations <- c(1, 5, seq(10, 100, 10))
 list_results <- evaluate(x=eval_sets, method=algorithms, n=n_recommendations)
 
-# We can see the ROC curve and Precision/Recall plots, showing the Java version performs close to the built-in version.  The "popular" method is nearly as good while recommending random items performs poorly.
-> plot(list_results, annotate = c(1,2,3), legend = "topleft")
-> plot(list_results, "prec/rec", annotate = c(1,2,3), legend = "bottomright")
+# We can see the ROC curve and Precision/Recall plots.  These show both the in-memory Java version and the Lucene version performing close to the built-in UBCF version.  The "popular" method is nearly as good while recommending random items performs poorly.
+> plot(list_results, annotate = c(1,2,3,4,5), legend = "topleft")
+> plot(list_results, "prec/rec", annotate = c(1,2,3,4,5), legend = "bottomright")
 ```

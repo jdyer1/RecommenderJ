@@ -33,7 +33,6 @@ public class FileLoader {
             }            
         }
         LabeledMatrix lm = new LabeledMatrix(m, rowLabels, colLabels);
-        //lm.save("/home/jdyer1/Desktop/" + m.numRows() + ".txt");
         return lm;
     }
     

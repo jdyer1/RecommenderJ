@@ -37,6 +37,9 @@ public class Utilities {
         return ratings;
     }
     public static void removeKnownRatings(Matrix ratingMatrix, Matrix knownRatings, double threshold) {
+        if(ratingMatrix == null || knownRatings==null) {
+            return;
+        }
         if(ratingMatrix.numRows()==0 || knownRatings.numRows()==0) {
             return;
         }            

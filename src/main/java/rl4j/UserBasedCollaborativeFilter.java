@@ -52,7 +52,7 @@ public class UserBasedCollaborativeFilter {
                 items.add(entry.getValue());
                 ratings.add(rawRecommendations.ratings.get(entry.getKey()));
             }
-            String[] itemLabels = testExamples.colLabels.length == 0 ? trainingExamples.colLabels : testExamples.colLabels;            
+            String[] itemLabels = testExamples.colLabels;
             return new TopNList(items, ratings, itemLabels, numRecommendations);
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,18 +67,18 @@ public class UserBasedCollaborativeFilter {
         for (int i = 0; i < ratingMatrix.numRows(); i++) {
             Vector v = ratingMatrix.getRow(i);
             PriorityQueue<PQEntry> pq = new PriorityQueue<>(n + 1);
-            for (VectorEntry ve : v) {                
+            for (VectorEntry ve : v) {
                 double val = ve.get();
                 if (val > 0) {
                     pq.add(new PQEntry(val, ve.index()));
                 }
                 if (pq.size() > n) {
-                    pq.poll();                    
+                    pq.poll();
                 }
             }
             int[] rowRecommendationItems = new int[pq.size()];
             double[] rowRecommendationRatings = new double[pq.size()];
-            int ii = pq.size()-1;
+            int ii = pq.size() - 1;
             PQEntry pqe;
             while ((pqe = pq.poll()) != null) {
                 rowRecommendationRatings[ii] = pqe.v;
@@ -100,14 +100,15 @@ public class UserBasedCollaborativeFilter {
         }
     }
 
-    private FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numRecommendations) {
+    protected FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numRecommendations) {
+        // TODO: specify separately num-neighbors vs numRecommendations
         FlexCompRowMatrix simMatrix = sim.similarity(testExamples.m, trainingExamples.m, likeThreshold);
         KNNResults knn = KNearestNeighbor.knn(simMatrix, numRecommendations);
         FlexCompRowMatrix items = Utilities.ratings(trainingExamples.m, knn.indexes);
         return items;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });
         SparseVector vb = new SparseVector(6, new int[] { 0, 1, 2 }, new double[] { 1, 1, 1 });
         SparseVector vc = new SparseVector(6, new int[] { 1, 2, 3, 4 }, new double[] { 1, 1, 1, 1 });

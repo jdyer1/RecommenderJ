@@ -1,10 +1,10 @@
-Package: recommenderJ
+Package: recommenderlab.java
 Type: Package
-Title: A Java recommender algorithm for the 'recommenderlab' package
-Version: 0.1
+Title: Java-based recommender algorithms for the 'recommenderlab' package
+Version: 0.2
 Date: 2016-08-29
 Depends: rJava, recommenderlab
 Author: James Dyer
 Maintainer: James Dyer <jdyer@apache.org>
-Description: This does User-Based Collaborative Filtering on Binary Ratings Matrixes using Jaccard Similarity.  This is designed to be used with the 'recommenderlab' package.
+Description: This package adds java-based recommender algorithms to be used with the 'recommenderlab' package.
 License: ASL 2.0

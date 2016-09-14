@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>rl4j</groupId>
-	<artifactId>recommenderlab-java</artifactId>
+	<artifactId>recommenderlab.java</artifactId>
 	<name>Recommenderlab R Java algorithms</name>
 	<packaging>jar</packaging>
 	<version>0.1</version>
@@ -13,7 +13,11 @@
 			<artifactId>mtj</artifactId>
 			<version>1.0.4</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>6.2.0</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -37,6 +41,14 @@
 						</goals>
 						<configuration>
 							<artifactItems>
+								<artifactItem>
+									<groupId>org.apache.lucene</groupId>
+									<artifactId>lucene-core</artifactId>
+									<version>6.2.0</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
+								</artifactItem>
 								<artifactItem>
 									<groupId>com.googlecode.matrix-toolkits-java</groupId>
 									<artifactId>mtj</artifactId>

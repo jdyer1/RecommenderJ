@@ -5,5 +5,10 @@
 			description="UBCF-Binary Data Java Implementation."
 	)	
 	print("method=JAVA added to recommenderlab for User-based collaborative filtering on binary matrices using Jaccard similarity.")	
+	recommenderRegistry$set_entry(
+			method="LUCENE", dataType = "binaryRatingMatrix", fun=BIN_LUCENE,
+			description="Lucene-Based Implementation."
+	)	
+	print("method=LUCENE added to recommenderlab for User-based collaborative filtering on binary matrices.")	
 }
 
