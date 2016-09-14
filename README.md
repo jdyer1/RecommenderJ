@@ -8,9 +8,8 @@ A demonstration integrating the R "recommenderlab" package with Java
 
 ## Use
 * See the [recommenderlab paper](https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf) for details on how to evaluate recommender engines in R.
-* This package is a Java implementation loosely mimicing the included UBCF recommender.
- * supports Binary Ratings Matrices
- * implements Jaccard Similarity
+* Use `method="JAVA"` with a Binary Ratings Matrix for a Java-based recommender similar to the built-in UBCF recommender, using Jaccard Similarity
+* Use `method="LUCENE"` with a Binary Ratings Matrix for a recommender built on Apache Lucene.  This will behave similar to the built-in UBCF recommender, using Cosine Similarity
 
 ## Example
 ```R
