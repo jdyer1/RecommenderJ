@@ -34,8 +34,8 @@ Loading required package: arules
 + "Java UBCF" = list(name="JAVA", param=NULL),
 + "Lucene UBCF" = list(name="LUCENE"))
 > eval_sets <- evaluationScheme(data=Jester_binary, method="cross-validation", k=4, given=5)
-n_recommendations <- c(1, 5, seq(10, 100, 10))
-list_results <- evaluate(x=eval_sets, method=algorithms, n=n_recommendations)
+> n_recommendations <- c(1, 5, seq(10, 100, 10))
+> list_results <- evaluate(x=eval_sets, method=algorithms, n=n_recommendations)
 
 # We can see the ROC curve and Precision/Recall plots.  These show both the in-memory Java version and the Lucene version performing close to the built-in UBCF version.  The "popular" method is nearly as good while recommending random items performs poorly.
 > plot(list_results, annotate = c(1,2,3,4,5), legend = "topleft")
