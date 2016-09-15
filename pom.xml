@@ -46,7 +46,7 @@
 									<artifactId>lucene-core</artifactId>
 									<version>6.2.0</version>
 									<type>jar</type>
-									<overWrite>false</overWrite>
+									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
 								</artifactItem>
 								<artifactItem>
@@ -54,7 +54,7 @@
 									<artifactId>mtj</artifactId>
 									<version>1.0.4</version>
 									<type>jar</type>
-									<overWrite>false</overWrite>
+									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
 								</artifactItem>
 								<artifactItem>
@@ -62,10 +62,11 @@
 									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
 									<type>${project.packaging}</type>
+									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
 								</artifactItem>
 							</artifactItems>
-							<overWriteReleases>false</overWriteReleases>
+							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>

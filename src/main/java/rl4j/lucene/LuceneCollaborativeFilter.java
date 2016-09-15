@@ -38,8 +38,7 @@ public class LuceneCollaborativeFilter extends UserBasedCollaborativeFilter {
     }
     
     @Override
-    protected FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numRecommendations) {
-        // TODO: specify separately num-neighbors vs numRecommendations
+    protected FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         try {
             DirectoryReader reader = DirectoryReader.open(dir);
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -56,7 +55,7 @@ public class LuceneCollaborativeFilter extends UserBasedCollaborativeFilter {
                     int val = (int) ve.get();
                     b.add(new BooleanClause(IntPoint.newExactQuery(colName, val), Occur.SHOULD));                
                 }
-                TopDocs td = searcher.search(b.build(), numRecommendations);
+                TopDocs td = searcher.search(b.build(), numNeighbors);
                 for (ScoreDoc scoredoc : td.scoreDocs) {
                     Document doc = searcher.doc(scoredoc.doc);
                     for(IndexableField f : doc.getFields()) {
@@ -104,11 +103,11 @@ public class LuceneCollaborativeFilter extends UserBasedCollaborativeFilter {
                 k++;
             }
         }
-        String path = "/home/jdyer1/Desktop/bwm.txt";
+        String path = "/tmp/LuceneIndex";
         Indexer indexer = new Indexer(path);
         indexer.importData(trainB, train.rowLabels, train.colLabels, true);
         LuceneCollaborativeFilter lcf = new LuceneCollaborativeFilter(path, 1);
-        Map<String, String[]> recommendations = lcf.generateRecommendations(test, 5);
+        Map<String, String[]> recommendations = lcf.generateRecommendations(test, 20, 5);
         for (String row : test.rowLabels) {
             System.out.print(row + ": ");
             for (String s : recommendations.get(row)) {

@@ -24,8 +24,8 @@ public class UserBasedCollaborativeFilter {
         this.likeThreshold = likeThreshold;
     }
 
-    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numRecommendations) {
-        FlexCompRowMatrix ratingsMatrix = ratingsMatrix(testExamples, numRecommendations);
+    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
+        FlexCompRowMatrix ratingsMatrix = ratingsMatrix(testExamples, numNeighbors);
         Utilities.removeKnownRatings(ratingsMatrix, testExamples.m, likeThreshold);
         RecommendationsByExampleIndex rawRecommendations =
             recommendationsByExampleIndex(ratingsMatrix, numRecommendations, 0);
@@ -40,9 +40,9 @@ public class UserBasedCollaborativeFilter {
         return recommendations;
     }
 
-    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numRecommendations) {
+    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
         try {
-            FlexCompRowMatrix ratingsMatrix = ratingsMatrix(testExamples, numRecommendations);
+            FlexCompRowMatrix ratingsMatrix = ratingsMatrix(testExamples, numNeighbors);
             Utilities.removeKnownRatings(ratingsMatrix, testExamples.m, likeThreshold);
             RecommendationsByExampleIndex rawRecommendations =
                 recommendationsByExampleIndex(ratingsMatrix, numRecommendations, 1);
@@ -100,10 +100,9 @@ public class UserBasedCollaborativeFilter {
         }
     }
 
-    protected FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numRecommendations) {
-        // TODO: specify separately num-neighbors vs numRecommendations
+    protected FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         FlexCompRowMatrix simMatrix = sim.similarity(testExamples.m, trainingExamples.m, likeThreshold);
-        KNNResults knn = KNearestNeighbor.knn(simMatrix, numRecommendations);
+        KNNResults knn = KNearestNeighbor.knn(simMatrix, numNeighbors);
         FlexCompRowMatrix items = Utilities.ratings(trainingExamples.m, knn.indexes);
         return items;
     }
@@ -131,7 +130,7 @@ public class UserBasedCollaborativeFilter {
             new String[] { "c1", "c2", "c3", "c4", "c5", "c6" });
 
         UserBasedCollaborativeFilter ubcf = new UserBasedCollaborativeFilter(train, 1);
-        Map<String, String[]> recommendations = ubcf.generateRecommendations(test, 5);
+        Map<String, String[]> recommendations = ubcf.generateRecommendations(test, 20, 5);
         for (String row : test.rowLabels) {
             System.out.print(row + ": ");
             for (String s : recommendations.get(row)) {

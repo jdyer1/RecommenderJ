@@ -1,5 +1,8 @@
+.BIN_JAVA_param <- list(nn = 25)
+
 BIN_JAVA <-
 function(data, parameter = NULL) {
+	p <- getParameters(.BIN_JAVA_param, parameter)
 	fileLoader <- .jnew("rl4j/FileLoader")
 
 	dataJ <- fileLoader$importData(as.vector(data@data@data), data@data@itemsetInfo$itemsetID, data@data@itemInfo$labels)
@@ -13,11 +16,11 @@ function(data, parameter = NULL) {
 	if(.jcheck(silent = TRUE)) {
 		print(e)
 	} 
-  model <- list(description = "UBCF-Binary Data Java Implementation", data = data, UBCF=UBCF)
+  model <- list(description = "UBCF-Binary Data Java Implementation", data = data, UBCF=UBCF, nn=p$nn)
   
   predict <- function(model, newdata, n=10, data=NULL, type=c("topNList"),...) {  
     dataJtest <- fileLoader$importData(as.vector(newdata@data@data), newdata@data@itemsetInfo$itemsetID, newdata@data@itemInfo$labels)
-    topNJ <- model$UBCF$recommendationsAsTopNList(dataJtest, as.integer(n))
+    topNJ <- model$UBCF$recommendationsAsTopNList(dataJtest, as.integer(model$nn), as.integer(n))
 		e <- .jgetEx()
 		if(.jcheck(silent = TRUE)) {
 			print(e)

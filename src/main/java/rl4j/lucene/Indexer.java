@@ -1,7 +1,6 @@
 package rl4j.lucene;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -14,32 +13,24 @@ import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 public class Indexer {
-    private final String path;
     private final Directory dir;
 
     public Indexer(String path) throws IOException {
-        this.dir = FSDirectory.open(FileSystems.getDefault().getPath(new File(path).getParent(), "LuceneIndex"));
-        this.path = path;
+        this.dir = FSDirectory.open(FileSystems.getDefault().getPath(path));
     }
 
-    public void reindexFile(boolean overwrite) throws IOException {
+    public void reindexFile(String filePath, boolean overwrite) throws IOException {
         IndexWriterConfig iwc = indexWriterConfig(overwrite);
         String[] colLabels;
-        try (BufferedReader br = new BufferedReader(new FileReader(path)); IndexWriter iw = new IndexWriter(dir, iwc)) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath)); IndexWriter iw = new IndexWriter(dir, iwc)) {
             Pattern commaPattern = Pattern.compile(",");
             Pattern quotePattern = Pattern.compile("[\"]");
             colLabels = commaPattern.split(quotePattern.matcher(br.readLine()).replaceAll(""));
@@ -110,32 +101,4 @@ public class Indexer {
             throw e;
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        String path = "/home/jdyer1/Desktop/bwm.txt";
-        Indexer indexer = new Indexer(path);
-        indexer.reindexFile(true);
-        DirectoryReader reader = DirectoryReader.open(indexer.dir);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        int chunkSize = 1000;
-        Query q = new MatchAllDocsQuery();
-        TopDocs td = searcher.search(q, chunkSize);
-        int hits = td.totalHits;
-        int seen = 0;
-        ScoreDoc lastDoc = null;
-        while (seen < hits) {
-            seen += td.scoreDocs.length;
-            for (ScoreDoc scoredoc : td.scoreDocs) {
-                Document doc = searcher.doc(scoredoc.doc);
-                String docStr = doc.toString();
-                docStr = docStr.length() > 300 ? docStr.substring(0, 300) + "..." : docStr;
-                System.out.println(scoredoc.doc + " | " + scoredoc.score + " | " + docStr);
-                lastDoc = scoredoc;
-            }
-            if (seen < hits) {
-                td = searcher.searchAfter(lastDoc, q, chunkSize);
-            }
-        }
-    }
-
 }
