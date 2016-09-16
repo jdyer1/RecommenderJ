@@ -30,8 +30,8 @@ Loading required package: arules
 + "random items" = list(name = "RANDOM", param=NULL),
 + "popular items" = list(name="POPULAR", param=NULL),
 + "built-in UBCF" = list(name="UBCF", param=list(nn=50)),
-+ "Java UBCF" = list(name="JAVA", param=NULL),
-+ "Lucene UBCF" = list(name="LUCENE"))
++ "Java UBCF" = list(name="JAVA", param = list(nn=50)),
++ "Lucene UBCF" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk")))
 > eval_sets <- evaluationScheme(data=Jester_binary, method="cross-validation", k=4, given=5)
 > n_recommendations <- c(1, 5, seq(10, 100, 10))
 > list_results <- evaluate(x=eval_sets, method=algorithms, n=n_recommendations)

@@ -1,6 +1,5 @@
 package rl4j.lucene;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class LuceneCollaborativeFilter extends UserBasedCollaborativeFilter {
 
     public LuceneCollaborativeFilter(String path, double likeThreshold) throws IOException {
         super(null, likeThreshold);
-        this.dir = FSDirectory.open(FileSystems.getDefault().getPath(new File(path).getParent(), "LuceneIndex"));
+        this.dir = FSDirectory.open(FileSystems.getDefault().getPath(path));
     }
     
     @Override
