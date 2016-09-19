@@ -17,10 +17,11 @@ import rl4j.KNearestNeighbor.KNNResults;
 public class UserBasedCollaborativeFilter {
     private final LabeledMatrix trainingExamples;
     private final double likeThreshold;
-    private final Similarity sim = new JaccardSimilarity();
+    private final Similarity sim;
 
-    public UserBasedCollaborativeFilter(LabeledMatrix trainingExamples, double likeThreshold) {
+    public UserBasedCollaborativeFilter(LabeledMatrix trainingExamples, Similarity sim, double likeThreshold) {
         this.trainingExamples = trainingExamples;
+        this.sim = sim;
         this.likeThreshold = likeThreshold;
     }
 
@@ -129,7 +130,7 @@ public class UserBasedCollaborativeFilter {
         LabeledMatrix test = new LabeledMatrix(testM, new String[] { "three", "four" },
             new String[] { "c1", "c2", "c3", "c4", "c5", "c6" });
 
-        UserBasedCollaborativeFilter ubcf = new UserBasedCollaborativeFilter(train, 1);
+        UserBasedCollaborativeFilter ubcf = new UserBasedCollaborativeFilter(train, new JaccardSimilarity(), 1);
         Map<String, String[]> recommendations = ubcf.generateRecommendations(test, 20, 5);
         for (String row : test.rowLabels) {
             System.out.print(row + ": ");

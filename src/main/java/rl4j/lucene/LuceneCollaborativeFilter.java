@@ -32,7 +32,7 @@ public class LuceneCollaborativeFilter extends UserBasedCollaborativeFilter {
     }
 
     public LuceneCollaborativeFilter(String path, double likeThreshold) throws IOException {
-        super(null, likeThreshold);
+        super(null, null, likeThreshold);
         this.dir = FSDirectory.open(FileSystems.getDefault().getPath(path));
     }
     
