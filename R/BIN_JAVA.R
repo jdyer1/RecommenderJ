@@ -15,7 +15,7 @@ BIN_JAVA <- function(data, parameter = NULL) {
 		sim <- .jnew("rl4j/JaccardSimilarity")
 	}
 	sim <- .jcast(sim, new.class="rl4j/Similarity")
-	UBCF <- .jnew("rl4j/UserBasedCollaborativeFilter", dataJ, sim, 1.0) 
+	UBCF <- .jnew("rl4j/MemoryUserBasedCollaborativeFilter", dataJ, sim, 1.0) 
 	e <- .jgetEx()
 	if(.jcheck(silent = TRUE)) {
 		print(e)

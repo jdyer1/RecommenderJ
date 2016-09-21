@@ -8,8 +8,14 @@ A demonstration integrating the R "recommenderlab" package with Java
 
 ## Use
 * See the [recommenderlab paper](https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf) for details on how to evaluate recommender engines in R.
-* Use `method="JAVA"` with a Binary Ratings Matrix for a Java-based recommender similar to the built-in UBCF recommender, using Jaccard Similarity
-* Use `method="LUCENE"` with a Binary Ratings Matrix for a recommender built on Apache Lucene.  This will behave similar to the built-in UBCF recommender, using Cosine Similarity
+* Use `name="JAVA"` with a Binary Ratings Matrix for a Java-based recommender similar to the built-in UBCF recommender, using Jaccard or Cosine Similarity
+ * `method="COSINE"` for cosine similarity (Ochiai coefficient)
+ * `method="JACCARD"` for Jaccard similarity
+* Use `name="LUCENE"` with a Binary Ratings Matrix for a recommender built on Apache Lucene.  This will behave similar to the built-in UBCF recommender, using Cosine Similarity
+ * `method="QUERY"` to find documents by building a query enumerated with stored field values (faster).
+   * `index.field.type="POINT"` to index documents as int points (1 or 0).
+   * `index.field.type="STRING"` to index documents as Strings ("1" or "0"), with tf-idf disabled.
+ * `method="MLT"` to find documents using Lucene's More-Like-This feature (Term Vectors) (slower).
 
 ## Example
 ```R
@@ -30,13 +36,15 @@ Loading required package: arules
 + "random items" = list(name = "RANDOM", param=NULL),
 + "popular items" = list(name="POPULAR", param=NULL),
 + "built-in UBCF" = list(name="UBCF", param=list(nn=50)),
-+ "Java UBCF" = list(name="JAVA", param = list(nn=50)),
-+ "Lucene UBCF" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk")))
++ "Java UBCF Jaccard" = list(name="JAVA", param = list(nn=50, method="JACCARD")),
++ "Java UBCF Cosine" = list(name="JAVA", param = list(nn=50, method="COSINE")),
++ "Lucene UBCF MLT" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk", method="MLT", index.field.type="POINT")),
++ "Lucene UBCF QUERY" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk", method="QUERY")))
 > eval_sets <- evaluationScheme(data=Jester_binary, method="cross-validation", k=4, given=5)
 > n_recommendations <- c(1, 5, seq(10, 100, 10))
 > list_results <- evaluate(x=eval_sets, method=algorithms, n=n_recommendations)
 
 # We can see the ROC curve and Precision/Recall plots.  These show both the in-memory Java version and the Lucene version performing close to the built-in UBCF version.  The "popular" method is nearly as good while recommending random items performs poorly.
-> plot(list_results, annotate = c(1,2,3,4,5), legend = "topleft")
-> plot(list_results, "prec/rec", annotate = c(1,2,3,4,5), legend = "bottomright")
+> plot(list_results, annotate = c(1,2,3,4,5,6,7), legend = "topleft")
+> plot(list_results, "prec/rec", annotate = c(1,2,3,4,5,6,7), legend = "bottomright")
 ```

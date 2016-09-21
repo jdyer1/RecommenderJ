@@ -18,6 +18,11 @@
 			<artifactId>lucene-core</artifactId>
 			<version>6.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queries</artifactId>
+			<version>6.2.0</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -44,6 +49,14 @@
 								<artifactItem>
 									<groupId>org.apache.lucene</groupId>
 									<artifactId>lucene-core</artifactId>
+									<version>6.2.0</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.lucene</groupId>
+									<artifactId>lucene-queries</artifactId>
 									<version>6.2.0</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
