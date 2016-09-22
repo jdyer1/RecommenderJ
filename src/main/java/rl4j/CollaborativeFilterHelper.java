@@ -1,6 +1,7 @@
 package rl4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,6 @@ import no.uib.cipr.matrix.MatrixEntry;
 import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
-import rl4j.MemoryUserBasedCollaborativeFilter.RecommendationsByExampleIndex;
 
 public class CollaborativeFilterHelper {
     private final CollaborativeFilter cf;
@@ -19,6 +19,16 @@ public class CollaborativeFilterHelper {
     public CollaborativeFilterHelper(CollaborativeFilter cf) {
         this.cf = cf;
         
+    }    
+    
+    public static class RecommendationsByExampleIndex {
+        public final Map<Integer, int[]> items;
+        public final Map<Integer, double[]> ratings;
+
+        public RecommendationsByExampleIndex(Map<Integer, int[]> items, Map<Integer, double[]> ratings) {
+            this.items = Collections.unmodifiableMap(items);
+            this.ratings = Collections.unmodifiableMap(ratings);
+        }
     }    
     
     public void removeKnownRatings(Matrix ratingMatrix, Matrix knownRatings, double threshold) {

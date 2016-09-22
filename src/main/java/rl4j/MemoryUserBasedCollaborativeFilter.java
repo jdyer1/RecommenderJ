@@ -1,7 +1,6 @@
 package rl4j;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -27,15 +26,6 @@ public class MemoryUserBasedCollaborativeFilter implements CollaborativeFilter {
         this.cfh = new CollaborativeFilterHelper(this);
     }    
 
-    public static class RecommendationsByExampleIndex {
-        public final Map<Integer, int[]> items;
-        public final Map<Integer, double[]> ratings;
-
-        public RecommendationsByExampleIndex(Map<Integer, int[]> items, Map<Integer, double[]> ratings) {
-            this.items = Collections.unmodifiableMap(items);
-            this.ratings = Collections.unmodifiableMap(ratings);
-        }
-    }
     @Override
     public FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         FlexCompRowMatrix simMatrix = sim.similarity(testExamples.m, trainingExamples.m, likeThreshold);
