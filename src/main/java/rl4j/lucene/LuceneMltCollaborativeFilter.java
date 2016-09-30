@@ -25,27 +25,25 @@ import rl4j.TopNList;
 
 public class LuceneMltCollaborativeFilter extends LuceneAccessBase implements CollaborativeFilter {
     private final double likeThreshold;
-    private final CollaborativeFilterHelper cfh;
 
     static {
         BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
     }
 
-    public LuceneMltCollaborativeFilter(String path, double likeThreshold)
-        throws IOException {
+    public LuceneMltCollaborativeFilter(String path, double likeThreshold) throws IOException {
         super(path, IndexedFieldType.STRING_TERM_VECTORS);
         this.likeThreshold = likeThreshold;
-        this.cfh = new CollaborativeFilterHelper();
     }
 
     private FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         try {
             Indexer indexer = new Indexer(path, indexedFieldType);
-            indexer.importData(convertToBooleanArray(testExamples), testExamples.rowLabels, testExamples.colLabels, false);
+            indexer.importData(convertToBooleanArray(testExamples), testExamples.rowLabels, testExamples.colLabels,
+                false);
             DirectoryReader reader = DirectoryReader.open(dir);
             IndexSearcher searcher = new IndexSearcher(reader);
             String[] fieldNames = new String[testExamples.colLabels.length];
-            for(int i=0 ; i<fieldNames.length ; i++) {
+            for (int i = 0; i < fieldNames.length; i++) {
                 fieldNames[i] = "x" + i;
             }
             MoreLikeThis mlt = new MoreLikeThis(searcher.getIndexReader());
@@ -64,7 +62,7 @@ public class LuceneMltCollaborativeFilter extends LuceneAccessBase implements Co
                     continue;
                 }
                 TopDocs td = searcher.search(new TermQuery(new Term("id", testExamples.rowLabel(i))), 1);
-                if (td.totalHits == 1) {                    
+                if (td.totalHits == 1) {
                     Query q = mlt.like(td.scoreDocs[0].doc);
                     td = searcher.search(q, numNeighbors);
                     for (ScoreDoc scoredoc : td.scoreDocs) {
@@ -84,18 +82,19 @@ public class LuceneMltCollaborativeFilter extends LuceneAccessBase implements Co
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
-    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.generateRecommendations(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
-    }
-    
-    @Override
-    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.recommendationsAsTopNList(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
+    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors,
+        int numRecommendations) {
+        return CollaborativeFilterHelper.generateRecommendations(testExamples,
+            ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
 
-    
+    @Override
+    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
+        return CollaborativeFilterHelper.recommendationsAsTopNList(testExamples,
+            ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
+    }
 
     public static void main(String[] args) throws Exception {
         SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });

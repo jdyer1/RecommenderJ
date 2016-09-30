@@ -13,6 +13,12 @@
 	print("method=LUCENE added to recommenderlab for User-based collaborative filtering on binary matrices.")	
 	
 	recommenderRegistry$set_entry(
+			method="SOLR", dataType = "binaryRatingMatrix", fun=BIN_SOLR,
+			description="Solr-Based Implementation."
+	)	
+	print("method=SOLR added to recommenderlab for User-based collaborative filtering on binary matrices.")	
+	
+	recommenderRegistry$set_entry(
 			method="CLIMF", dataType = "binaryRatingMatrix", fun=BIN_CLIMF,
 			description="CLIMF Bindar Data Java Implementation."
 	)	

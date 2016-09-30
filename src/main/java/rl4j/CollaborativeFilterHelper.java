@@ -13,7 +13,9 @@ import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
 
-public class CollaborativeFilterHelper {        
+public class CollaborativeFilterHelper {  
+    
+    private CollaborativeFilterHelper() { }
     
     public static class RecommendationsByExampleIndex {
         public final Map<Integer, int[]> items;
@@ -25,7 +27,7 @@ public class CollaborativeFilterHelper {
         }
     }    
     
-    public void removeKnownRatings(Matrix ratingMatrix, Matrix knownRatings, double threshold) {
+    public static void removeKnownRatings(Matrix ratingMatrix, Matrix knownRatings, double threshold) {
         if(ratingMatrix == null || knownRatings==null) {
             return;
         }
@@ -42,7 +44,7 @@ public class CollaborativeFilterHelper {
         }
     } 
     
-    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, FlexCompRowMatrix ratingsMatrix, int numRecommendations, double likeThreshold) {
+    public static Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, FlexCompRowMatrix ratingsMatrix, int numRecommendations, double likeThreshold) {
         removeKnownRatings(ratingsMatrix, testExamples.m, likeThreshold);
         RecommendationsByExampleIndex rawRecommendations =
             recommendationsByExampleIndex(ratingsMatrix, numRecommendations, 0);
@@ -57,7 +59,7 @@ public class CollaborativeFilterHelper {
         return recommendations;
     }
 
-    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, FlexCompRowMatrix ratingsMatrix, int numRecommendations, double likeThreshold) {
+    public static TopNList recommendationsAsTopNList(LabeledMatrix testExamples, FlexCompRowMatrix ratingsMatrix, int numRecommendations, double likeThreshold) {
         try {            
             removeKnownRatings(ratingsMatrix, testExamples.m, likeThreshold);
             RecommendationsByExampleIndex rawRecommendations =
@@ -76,7 +78,7 @@ public class CollaborativeFilterHelper {
         return null;
     }
 
-    public RecommendationsByExampleIndex recommendationsByExampleIndex(FlexCompRowMatrix ratingMatrix, int n,
+    public static RecommendationsByExampleIndex recommendationsByExampleIndex(FlexCompRowMatrix ratingMatrix, int n,
         int offset) {
         Map<Integer, int[]> items = new HashMap<>();
         Map<Integer, double[]> ratings = new HashMap<>();

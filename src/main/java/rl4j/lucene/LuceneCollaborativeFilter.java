@@ -28,72 +28,74 @@ import rl4j.TopNList;
 
 public class LuceneCollaborativeFilter extends LuceneAccessBase implements CollaborativeFilter {
     private final double likeThreshold;
-    private final CollaborativeFilterHelper cfh;
-    
-    public LuceneCollaborativeFilter(String path, double likeThreshold, IndexedFieldType indexedFieldType) throws IOException {
+
+    public LuceneCollaborativeFilter(String path, double likeThreshold, IndexedFieldType indexedFieldType)
+        throws IOException {
         super(path, indexedFieldType);
         this.likeThreshold = likeThreshold;
-        this.cfh = new CollaborativeFilterHelper();
     }
-    
+
     private FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         try {
             DirectoryReader reader = DirectoryReader.open(dir);
             IndexSearcher searcher = new IndexSearcher(reader);
             searcher.setSimilarity(Indexer.sim);
             FlexCompRowMatrix ratings = new FlexCompRowMatrix(testExamples.m.numRows(), testExamples.m.numColumns());
-            for(int i=0 ; i< testExamples.m.numRows() ; i++) {
+            for (int i = 0; i < testExamples.m.numRows(); i++) {
                 SparseVector v = testExamples.m.getRow(i);
-                if(v.getUsed()==0) {
+                if (v.getUsed() == 0) {
                     continue;
                 }
                 BooleanQuery.Builder b = new BooleanQuery.Builder();
                 b.setMinimumNumberShouldMatch(1);
-                for(VectorEntry ve : v) {
+                for (VectorEntry ve : v) {
                     String colName = "x" + ve.index();
                     int val = (int) ve.get();
-                    switch(indexedFieldType) {
+                    switch (indexedFieldType) {
                         case POINT:
-                            b.add(new BooleanClause(IntPoint.newExactQuery(colName, val), Occur.SHOULD));              
+                            b.add(new BooleanClause(IntPoint.newExactQuery(colName, val), Occur.SHOULD));
                             break;
                         case STRING:
-                            b.add(new BooleanClause(new TermQuery(new Term(colName, "" + val)), Occur.SHOULD)); 
+                            b.add(new BooleanClause(new TermQuery(new Term(colName, "" + val)), Occur.SHOULD));
                             break;
                         case STRING_TERM_VECTORS:
-                            b.add(new BooleanClause(new TermQuery(new Term(colName, "" + val)), Occur.SHOULD)); 
+                            b.add(new BooleanClause(new TermQuery(new Term(colName, "" + val)), Occur.SHOULD));
                             break;
                     }
-                      
+
                 }
                 Query q = b.build();
                 TopDocs td = searcher.search(q, numNeighbors);
                 for (ScoreDoc scoredoc : td.scoreDocs) {
                     Document doc = searcher.doc(scoredoc.doc);
-                    for(IndexableField f : doc.getFields()) {
-                        if(f.name().startsWith("x")) {
+                    for (IndexableField f : doc.getFields()) {
+                        if (f.name().startsWith("x")) {
                             int index = Integer.parseInt(f.name().substring(1));
                             int value = Integer.parseInt(f.stringValue());
                             ratings.add(i, index, value);
                         }
                     }
                 }
-            }            
+            }
             return ratings;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    } 
-    
+    }
 
     @Override
-    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.generateRecommendations(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
+    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors,
+        int numRecommendations) {
+        return CollaborativeFilterHelper.generateRecommendations(testExamples,
+            ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
-    
+
     @Override
     public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.recommendationsAsTopNList(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
+        return CollaborativeFilterHelper.recommendationsAsTopNList(testExamples,
+            ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
+
     public static void main(String[] args) throws Exception {
         SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });
         SparseVector vb = new SparseVector(6, new int[] { 0, 1, 2 }, new double[] { 1, 1, 1 });
@@ -116,10 +118,10 @@ public class LuceneCollaborativeFilter extends LuceneAccessBase implements Colla
         LabeledMatrix test = new LabeledMatrix(testM, new String[] { "three", "four" },
             new String[] { "c1", "c2", "c3", "c4", "c5", "c6" });
         boolean[] trainB = new boolean[trainM.numColumns() * trainM.numRows()];
-        int k=0;
-        for(int i=0 ; i<trainM.numRows() ; i++) {
-            for(int j=0 ; j<trainM.numColumns() ; j++) {
-                if(trainM.get(i, j) >0) {
+        int k = 0;
+        for (int i = 0; i < trainM.numRows(); i++) {
+            for (int j = 0; j < trainM.numColumns(); j++) {
+                if (trainM.get(i, j) > 0) {
                     trainB[k] = true;
                 }
                 k++;
@@ -138,5 +140,5 @@ public class LuceneCollaborativeFilter extends LuceneAccessBase implements Colla
             System.out.println("");
         }
 
-    }    
+    }
 }

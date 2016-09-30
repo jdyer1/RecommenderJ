@@ -16,12 +16,17 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>6.2.0</version>
+			<version>6.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queries</artifactId>
-			<version>6.2.0</version>
+			<version>6.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>6.2.1</version>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -47,30 +52,6 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>org.apache.lucene</groupId>
-									<artifactId>lucene-core</artifactId>
-									<version>6.2.0</version>
-									<type>jar</type>
-									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>org.apache.lucene</groupId>
-									<artifactId>lucene-queries</artifactId>
-									<version>6.2.0</version>
-									<type>jar</type>
-									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
-								</artifactItem>
-								<artifactItem>
-									<groupId>com.googlecode.matrix-toolkits-java</groupId>
-									<artifactId>mtj</artifactId>
-									<version>1.0.4</version>
-									<type>jar</type>
-									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
-								</artifactItem>
-								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
@@ -81,6 +62,19 @@
 							</artifactItems>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/../inst/java</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
 						</configuration>
 					</execution>
 				</executions>

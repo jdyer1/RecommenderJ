@@ -30,7 +30,6 @@ import no.uib.cipr.matrix.sparse.SparseVector;
  */
 public class ClimfCollaborativeFilter implements CollaborativeFilter {
     private final double likeThreshold;
-    private final CollaborativeFilterHelper cfh;
     private final int dimensionality;
     private final double lambda;
     private final double gamma;
@@ -49,8 +48,6 @@ public class ClimfCollaborativeFilter implements CollaborativeFilter {
         this.gamma = gamma;
         this.maxIterations = maxIterations;
         this.trainingExamples = trainingExamples;
-        this.cfh = new CollaborativeFilterHelper();
-
     }
 
     private void gradientAscent() {
@@ -270,12 +267,12 @@ public class ClimfCollaborativeFilter implements CollaborativeFilter {
     public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors,
         int numRecommendations) {
         FlexCompRowMatrix ratingsMatrix = ratingsMatrix(trainingExamples, testExamples);
-        return cfh.generateRecommendations(testExamples, ratingsMatrix, numRecommendations, likeThreshold);
+        return CollaborativeFilterHelper.generateRecommendations(testExamples, ratingsMatrix, numRecommendations, likeThreshold);
     }
 
     @Override
     public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.recommendationsAsTopNList(testExamples, ratingsMatrix(trainingExamples, testExamples),
+        return CollaborativeFilterHelper.recommendationsAsTopNList(testExamples, ratingsMatrix(trainingExamples, testExamples),
             numRecommendations, likeThreshold);
     }
 

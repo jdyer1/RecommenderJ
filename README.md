@@ -13,10 +13,10 @@ A demonstration integrating the R "recommenderlab" package with Java
  * `method="JACCARD"` for Jaccard similarity
 * Use `name="LUCENE"` with a Binary Ratings Matrix for a recommender built on Apache Lucene.  This will behave similar to the built-in UBCF recommender, using Cosine Similarity
  * `method="QUERY"` to find documents by building a query enumerated with stored field values (faster).
-   * `index.field.type="POINT"` to index documents as int points (1 or 0).
-   * `index.field.type="STRING"` to index documents as Strings ("1" or "0"), with tf-idf disabled.
+    * `index.field.type="POINT"` to index documents as int points (1 or 0).
+    * `index.field.type="STRING"` to index documents as Strings ("1" or "0"), with tf-idf disabled.
  * `method="MLT"` to find documents using Lucene's More-Like-This feature (Term Vectors) (slower).
-
+* Use `name="SOLR"` to index data and serve recommendations from a Solr server or zookeeper-managed cluster.  The data field should be stored, indexed and tokenized on whitespace.  Recommendations will be based on knn and cosine similarity.
 ## Example
 ```R
 # load required libraries
@@ -39,7 +39,8 @@ Loading required package: arules
 + "Java UBCF Jaccard" = list(name="JAVA", param = list(nn=50, method="JACCARD")),
 + "Java UBCF Cosine" = list(name="JAVA", param = list(nn=50, method="COSINE")),
 + "Lucene UBCF MLT" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk", method="MLT", index.field.type="POINT")),
-+ "Lucene UBCF QUERY" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk", method="QUERY")))
++ "Lucene UBCF QUERY" = list(name="LUCENE", param = list(nn=25, path="/path/to/save/lucene/index/on/disk", method="QUERY")),
++ "SOLR" = list(name="SOLR", param = list(nn=5, solrHosts="zkHost1:9983,zkHost2:9983",dataFieldName="ttlid",solrCollectionName="users",idFieldName="id")))
 > eval_sets <- evaluationScheme(data=Jester_binary, method="cross-validation", k=4, given=5)
 > n_recommendations <- c(1, 5, seq(10, 100, 10))
 > list_results <- evaluate(x=eval_sets, method=algorithms, n=n_recommendations)
