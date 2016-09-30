@@ -13,13 +13,7 @@ import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
 
-public class CollaborativeFilterHelper {
-    private final CollaborativeFilter cf;
-    
-    public CollaborativeFilterHelper(CollaborativeFilter cf) {
-        this.cf = cf;
-        
-    }    
+public class CollaborativeFilterHelper {        
     
     public static class RecommendationsByExampleIndex {
         public final Map<Integer, int[]> items;
@@ -48,9 +42,8 @@ public class CollaborativeFilterHelper {
         }
     } 
     
-    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        FlexCompRowMatrix ratingsMatrix = cf.ratingsMatrix(testExamples, numNeighbors);
-        removeKnownRatings(ratingsMatrix, testExamples.m, cf.getLikeThreshold());
+    public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, FlexCompRowMatrix ratingsMatrix, int numRecommendations, double likeThreshold) {
+        removeKnownRatings(ratingsMatrix, testExamples.m, likeThreshold);
         RecommendationsByExampleIndex rawRecommendations =
             recommendationsByExampleIndex(ratingsMatrix, numRecommendations, 0);
         Map<String, String[]> recommendations = new HashMap<>();
@@ -64,10 +57,9 @@ public class CollaborativeFilterHelper {
         return recommendations;
     }
 
-    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        try {
-            FlexCompRowMatrix ratingsMatrix = cf.ratingsMatrix(testExamples, numNeighbors);
-            removeKnownRatings(ratingsMatrix, testExamples.m, cf.getLikeThreshold());
+    public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, FlexCompRowMatrix ratingsMatrix, int numRecommendations, double likeThreshold) {
+        try {            
+            removeKnownRatings(ratingsMatrix, testExamples.m, likeThreshold);
             RecommendationsByExampleIndex rawRecommendations =
                 recommendationsByExampleIndex(ratingsMatrix, numRecommendations, 1);
             List<int[]> items = new ArrayList<>(rawRecommendations.items.size());

@@ -33,11 +33,10 @@ public class LuceneCollaborativeFilter extends LuceneAccessBase implements Colla
     public LuceneCollaborativeFilter(String path, double likeThreshold, IndexedFieldType indexedFieldType) throws IOException {
         super(path, indexedFieldType);
         this.likeThreshold = likeThreshold;
-        this.cfh = new CollaborativeFilterHelper(this);
+        this.cfh = new CollaborativeFilterHelper();
     }
     
-    @Override
-    public FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
+    private FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         try {
             DirectoryReader reader = DirectoryReader.open(dir);
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -84,19 +83,16 @@ public class LuceneCollaborativeFilter extends LuceneAccessBase implements Colla
             throw new RuntimeException(e);
         }
     } 
-    @Override
-    public double getLikeThreshold() {        
-        return likeThreshold;
-    }
+    
 
     @Override
     public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.generateRecommendations(testExamples, numNeighbors, numRecommendations);
+        return cfh.generateRecommendations(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
     
     @Override
     public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.recommendationsAsTopNList(testExamples, numNeighbors, numRecommendations);
+        return cfh.recommendationsAsTopNList(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
     public static void main(String[] args) throws Exception {
         SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });

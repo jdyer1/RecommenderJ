@@ -23,11 +23,10 @@ public class MemoryUserBasedCollaborativeFilter implements CollaborativeFilter {
         this.trainingExamples = trainingExamples;
         this.sim = sim;
         this.likeThreshold = likeThreshold;
-        this.cfh = new CollaborativeFilterHelper(this);
+        this.cfh = new CollaborativeFilterHelper();
     }    
 
-    @Override
-    public FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
+    private FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         FlexCompRowMatrix simMatrix = sim.similarity(testExamples.m, trainingExamples.m, likeThreshold);
         KNNResults knn = KNearestNeighbor.knn(simMatrix, numNeighbors);
         FlexCompRowMatrix items = ratings(trainingExamples.m, knn.indexes);
@@ -36,12 +35,12 @@ public class MemoryUserBasedCollaborativeFilter implements CollaborativeFilter {
     
     @Override
     public Map<String, String[]> generateRecommendations(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.generateRecommendations(testExamples, numNeighbors, numRecommendations);
+       return cfh.generateRecommendations(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
     
     @Override
     public TopNList recommendationsAsTopNList(LabeledMatrix testExamples, int numNeighbors, int numRecommendations) {
-        return cfh.recommendationsAsTopNList(testExamples, numNeighbors, numRecommendations);
+        return cfh.recommendationsAsTopNList(testExamples, ratingsMatrix(testExamples, numNeighbors), numRecommendations, likeThreshold);
     }
     
     private FlexCompRowMatrix ratings(Matrix data, Matrix knnResults) {
@@ -70,29 +69,35 @@ public class MemoryUserBasedCollaborativeFilter implements CollaborativeFilter {
     }
 
     public static void main(String[] args) throws Exception {
-        SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });
-        SparseVector vb = new SparseVector(6, new int[] { 0, 1, 2 }, new double[] { 1, 1, 1 });
-        SparseVector vc = new SparseVector(6, new int[] { 1, 2, 3, 4 }, new double[] { 1, 1, 1, 1 });
-        SparseVector vd = new SparseVector(6, new int[] { 0, 1 }, new double[] { 1, 1 });
-        SparseVector ve = new SparseVector(6, new int[] { 0, 1, 2, 3 }, new double[] { 1, 1, 1, 1 });
-        FlexCompRowMatrix m = new FlexCompRowMatrix(5, 6);
-        m.setRow(0, va);
-        m.setRow(1, vb);
-        m.setRow(2, vc);
-        m.setRow(3, vd);
-        m.setRow(4, ve);
+        SparseVector[] v = new SparseVector[10];
+        v[0] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 1, 1, 0, 0 });
+        v[1] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 1, 1, 0, 0 });
+        v[2] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 1, 1, 0, 0 });
+        v[3] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 1, 1, 0, 0 });
+        v[4] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 0, 0, 1, 1 });
+        v[5] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 0, 0, 1, 1 });
+        v[6] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 0, 0, 1, 1 });
+        v[7] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 0, 0, 1, 1 });
+        v[8] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 1, 0, 0, 0 });
+        v[9] = new SparseVector(4, new int[] { 0, 1, 2, 3 }, new double[] { 0, 0, 0, 1 });
+        
+        FlexCompRowMatrix trainM = new FlexCompRowMatrix(8, 4);
+        FlexCompRowMatrix testM = new FlexCompRowMatrix(2, 4);
+        for(int i=0 ; i<v.length ; i++) {
+            if(i<8) {
+                trainM.setRow(i, v[i]);
+            } 
+        } 
+        testM.setRow(0, v[8]);
+        testM.setRow(1, v[9]);
 
-        FlexCompRowMatrix trainM =
-            new FlexCompRowMatrix(Matrices.getSubMatrix(m, new int[] { 0, 1, 2 }, new int[] { 0, 1, 2, 3, 4, 5 }));
-        FlexCompRowMatrix testM =
-            new FlexCompRowMatrix(Matrices.getSubMatrix(m, new int[] { 3, 4 }, new int[] { 0, 1, 2, 3, 4, 5 }));
-        LabeledMatrix train = new LabeledMatrix(trainM, new String[] { "zero", "one", "two" },
-            new String[] { "c1", "c2", "c3", "c4", "c5", "c6" });
-        LabeledMatrix test = new LabeledMatrix(testM, new String[] { "three", "four" },
-            new String[] { "c1", "c2", "c3", "c4", "c5", "c6" });
+        LabeledMatrix train = new LabeledMatrix(trainM, new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight" },
+            new String[] { "c0", "c1", "c2", "c3" });
+        LabeledMatrix test = new LabeledMatrix(testM, new String[] { "nine", "ten" },
+            new String[] { "c0", "c1", "c2", "c3" });
 
         MemoryUserBasedCollaborativeFilter ubcf = new MemoryUserBasedCollaborativeFilter(train, new CosineSimilarity(), 1);
-        Map<String, String[]> recommendations = ubcf.generateRecommendations(test, 20, 5);
+        Map<String, String[]> recommendations = ubcf.generateRecommendations(test, 5, 1);
         for (String row : test.rowLabels) {
             System.out.print(row + ": ");
             for (String s : recommendations.get(row)) {
@@ -102,9 +107,5 @@ public class MemoryUserBasedCollaborativeFilter implements CollaborativeFilter {
         }
 
     }
-    @Override
-    public double getLikeThreshold() {
-        return likeThreshold;
-    }
-
+    
 }
