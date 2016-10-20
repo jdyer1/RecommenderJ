@@ -1,6 +1,9 @@
 package rl4j.solr;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -11,7 +14,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 
-import no.uib.cipr.matrix.Matrices;
 import no.uib.cipr.matrix.VectorEntry;
 import no.uib.cipr.matrix.sparse.FlexCompRowMatrix;
 import no.uib.cipr.matrix.sparse.SparseVector;
@@ -89,6 +91,38 @@ public class SolrCollaborativeFilter implements CollaborativeFilter {
         }
 
     }
+    
+    public void indexTrainingData(BufferedReader r, boolean deleteAll) {        
+        try {
+            if (deleteAll) {
+                solrClient.deleteByQuery("*:*", 0);
+            }
+            Pattern commaPattern = Pattern.compile("[,]");
+            Pattern quotePattern = Pattern.compile("[\"]");
+            String a = r.readLine();
+            a = quotePattern.matcher(a).replaceAll("");
+            String[] colLabels = commaPattern.split(a);
+            while ((a=r.readLine())!=null) {
+                a = quotePattern.matcher(a).replaceAll("");
+                String[] tokens = commaPattern.split(a);
+                SolrInputDocument doc = new SolrInputDocument();
+                doc.addField(idFieldname, tokens[0]);
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < colLabels.length; j++) {
+                    if ("1".equals(tokens[j+1])) {
+                        sb.append(sb.length() == 0 ? "" : " ");
+                        sb.append("x" + colLabels[j]);
+                    }
+                }
+                doc.addField(dataFieldname, sb.toString());
+                solrClient.add(doc);
+            }
+            solrClient.commit();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     private FlexCompRowMatrix ratingsMatrix(LabeledMatrix testExamples, int numNeighbors) {
         try {
@@ -144,11 +178,16 @@ public class SolrCollaborativeFilter implements CollaborativeFilter {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 4) {
-            System.out.println("[host] [collection] [idfieldname] [datafieldname]");
+        if (args.length < 5) {
+            System.out.println("[host] [collection] [idfieldname] [datafieldname] [file]");
             return;
         }
-        SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });
+        try (BufferedReader br = new BufferedReader(new FileReader(args[4]))) {
+            SolrCollaborativeFilter scf = new SolrCollaborativeFilter(args[0], true, args[1], args[2], args[3], 1.0);
+            scf.indexTrainingData(br, true);
+        }
+        
+        /*SparseVector va = new SparseVector(6, new int[] { 0, 1, 2, 3, 4, 5 }, new double[] { 1, 1, 1, 1, 1, 1 });
         SparseVector vb = new SparseVector(6, new int[] { 0, 1, 2 }, new double[] { 1, 1, 1 });
         SparseVector vc = new SparseVector(6, new int[] { 1, 2, 3, 4 }, new double[] { 1, 1, 1, 1 });
         SparseVector vd = new SparseVector(6, new int[] { 0, 1 }, new double[] { 1, 1 });
@@ -187,7 +226,7 @@ public class SolrCollaborativeFilter implements CollaborativeFilter {
                 System.out.print(s + " , ");
             }
             System.out.println("");
-        }
+        }*/
 
     }
 }
